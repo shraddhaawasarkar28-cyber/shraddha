@@ -1,11 +1,15 @@
 steps:
- - name: 'gcr.io/cloud-builders/docker'
+- name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--no-cache', '-t', 'us-central1-docker.pkg.dev/my-first-project1-464509/gke-repo/quickstart-image:$COMMIT_SHA', '.']
 
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/my-first-project1/gke-repo/quickstart-image']
-    id: 'Push Docker Image'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us-central1-docker.pkg.dev/my-first-project1-464509/gke-repo/quickstart-image:$COMMIT_SHA']
 
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/my-first-project1/gke-repo/quickstart-image', './app2']
-    id: 'Build Docker Image2'
+- name: 'gcr.io/cloud-builders/gke-deploy'
+  args:
+    - run
+    - --filename=k8s-manifests
+    - --image=us-central1-docker.pkg.dev/my-first-project1-464509/gke-repo/quickstart-image:$COMMIT_SHA
+    - --cluster=gkcluster
+    - --location=us-central1
+    - --namespace=default
